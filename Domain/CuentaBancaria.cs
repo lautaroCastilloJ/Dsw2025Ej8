@@ -1,122 +1,41 @@
-﻿namespace Dsw2025Ej8.Domain;
+﻿using System;
 
-public class CuentaBancaria
+namespace Dsw2025Ej8.Domain;
+
+public abstract class CuentaBancaria
 {
-    private TipoCuenta _tipo;
-    private string _numero;
-    private decimal _saldo;
-    private Estado _estado;
-    private decimal _tasaDeInteres;
-    private decimal _limiteDeDescubierto;
-    private decimal _comision;
-    private string[] _titulares;
+    public string Numero { get; }
+    public decimal Saldo { get; protected set; }
+    public Estado Estado { get; protected set; }
+    public string[] Titulares { get; }
+    public abstract string Tipo { get; } // propiedad abstracta que debe ser implementada en las clases derivadas.
+    //public string? MotivoSuspension { get; protected set; }
 
-    public CuentaBancaria(string numero, decimal saldo, TipoCuenta tipo, string[] titulares)
+
+    protected CuentaBancaria(string numero, decimal saldo, string[] titulares) // Como CuentaBancaria es una clase abstracta no puede ser instanciada directamente por eso el constructor de objetos o instancias de la clase es protected, así las clases derivadas pueden usar su constructor con base(...). protected asegura que solo las clases hijas puedan usar ese constructor.
     {
-        _numero = numero;
-        _saldo = saldo;
-        _tipo = tipo;
-        _estado = Estado.Activa;
-        _titulares = titulares;
-    }
-    #region Getters/Setters
-    public string GetNumero()
-    {
-        return _numero;
+        Numero = numero;
+        Saldo = saldo;
+        Estado = Estado.Activa;
+        Titulares = titulares;
     }
 
-    public decimal GetSaldo()
+    protected void ValidarMonto(decimal monto)
     {
-        return _saldo;
-    }
-    public TipoCuenta GetTipo()
-    {
-        return _tipo;
+        if (monto <= 0)
+            throw new Exceptions.MontoNoValidoException();
     }
 
-    public Estado GetEstado()
+    protected void ValidarEstado()
     {
-        return _estado;
+        if (Estado != Estado.Activa)
+            throw new Exceptions.CuentaNoActivaException(Estado);
     }
 
-    public void SetEstado(Estado estado)
-    {
-        _estado = estado;
-    }
+    public abstract void Depositar(decimal monto);
+    public abstract void Retirar(decimal monto); // el método Retirar no es virtual porque todas las cuentas deben implementar su propia lógica de retiro “Esto DEBE ser implementado en una clase derivada”.
+    public virtual void AplicarInteres() { } // es virtual porque no todas las cuentas aplican interés y tampoco lo hacen de la misma manera, por lo tanto es opcional “Esto puede ser sobrescrito en una clase derivada”.
+    
 
-    public decimal GetTasaDeInteres()
-    {
-        return _tasaDeInteres;
-    }
 
-    public void SetTasaDeInteres(decimal tasaDeInteres)
-    {
-        _tasaDeInteres = tasaDeInteres;
-    }
-
-    public decimal GetLimiteDeDescubierto()
-    {
-        return _limiteDeDescubierto;
-    }
-
-    public void SetLimiteDeDescubierto(decimal limiteDeDescubierto)
-    {
-        _limiteDeDescubierto = limiteDeDescubierto;
-    }
-
-    public decimal GetComision()
-    {
-        return _comision;
-    }
-
-    public void SetComision(decimal comision)
-    {
-        _comision = comision;
-    }
-
-    public string[] GetTitulares()
-    {
-        return _titulares;
-    }
-    #endregion
-
-    public void Depositar(decimal monto)
-    {
-        if (_tipo == TipoCuenta.CajaDeAhorro)
-        {
-            _saldo += monto;
-        }
-        else if (_tipo == TipoCuenta.CuentaCorriente)
-        {
-            monto -= monto * _comision;
-            _saldo += monto;
-        }
-    }
-
-    public void Retirar(decimal monto)
-    {
-        if (_tipo == TipoCuenta.CajaDeAhorro)
-        {
-            _saldo -= monto;
-        }
-        else if (_tipo == TipoCuenta.CuentaCorriente)
-        {
-            if (_saldo - monto >= -_limiteDeDescubierto)
-            {
-                _saldo -= monto;
-            }
-            if (_saldo < 0)
-            {
-                _estado = Estado.Suspendida;
-            }
-        }
-    }
-
-    public void AplicarInteres()
-    {
-        if (_tipo == TipoCuenta.CajaDeAhorro)
-        {
-            _saldo += _saldo * _tasaDeInteres;
-        }
-    }
 }
