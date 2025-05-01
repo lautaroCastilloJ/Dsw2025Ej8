@@ -3,9 +3,10 @@
 public class CajaDeAhorro : CuentaBancaria
 {
     public decimal TasaDeInteres { get; set; }
+    public override string TipoDeCuenta => "Caja de Ahorro";
 
-    public CajaDeAhorro(string numero, decimal saldo, string[] titulares) // No tiene lógica adicional porque no necesita inicializar nada más en ese momento (por ejemplo, TasaDeInteres se asigna después, como se pide en el enunciado).
-        : base(numero, saldo, titulares) { } //“Antes de que empiece el constructor de la subclase, ejecutá el constructor de la superclase con estos valores y luego el de la subclase”
+    public CajaDeAhorro(string numero, decimal saldo, string[] titulares) // No tiene lógica adicional porque no necesita inicializar nada más al momento de instanciar, por ejemplo, TasaDeInteres se asigna después, como se pide en el enunciado.
+        : base(numero, saldo, titulares) { } 
 
     public override void Depositar(decimal monto)
     {
@@ -30,15 +31,8 @@ public class CajaDeAhorro : CuentaBancaria
 
     public override void AplicarInteres()
     {
-        ValidarEstado(); // Verifica que la cuenta esté activa antes de aplicar el interés
-        Saldo += Saldo * TasaDeInteres;
+        ValidarEstado(); //La cuenta debe estar Activa.
+        Saldo += (Saldo * TasaDeInteres);
     }
 
-    public override string Tipo => "Caja de Ahorro";
 }
-
-/*
-  if (Estado == Estado.Activa)
-            Saldo += Saldo * TasaDeInteres;
- 
- */

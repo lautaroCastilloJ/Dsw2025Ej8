@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dsw2025Ej8.Domain.Exceptions
+namespace Dsw2025Ej8.Exceptions
 {
     internal class SaldoInsuficienteException : Exception
     {
